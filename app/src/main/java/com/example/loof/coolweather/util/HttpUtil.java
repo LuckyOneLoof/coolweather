@@ -1,5 +1,7 @@
 package com.example.loof.coolweather.util;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +20,7 @@ public class HttpUtil {
                 try{
                     URL url = new URL(address);
                     connection = (HttpURLConnection)url.openConnection();
+                    connection.setRequestProperty("apikey", "dad3e9f24648f350c5722b35fa7698cb");
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
@@ -28,7 +31,6 @@ public class HttpUtil {
                     while((line = reader.readLine()) != null){
                         response.append(line);
                     }
-
                     if(listener != null)
                         listener.onFinish(response.toString());
                 }catch (Exception e){

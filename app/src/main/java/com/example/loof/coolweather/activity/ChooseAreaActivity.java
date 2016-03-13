@@ -143,9 +143,9 @@ public class ChooseAreaActivity extends Activity {
     private void queryFromServer(final String code, final String type) {
         String address;
         if (!TextUtils.isEmpty(code)) {
-            address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
+            address = "http://m.weather.com.cn/data5/city"/*http://www.weather.com.cn/data/list3/city"*/ + code + ".xml";
         } else {
-            address = "http://www.weather.com.cn/data/list3/city.xml";
+            address = "http://m.weather.com.cn/data5/city.xml";//http://www.weather.com.cn/data/list3/city.xml";
         }
         showProgressDialog();
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {

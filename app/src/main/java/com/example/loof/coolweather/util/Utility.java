@@ -10,13 +10,11 @@ import com.example.loof.coolweather.db.CoolWeatherDB;
 import com.example.loof.coolweather.model.City;
 import com.example.loof.coolweather.model.County;
 import com.example.loof.coolweather.model.Province;
+import com.example.loof.coolweather.model.WeatherInfo;
 
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.prefs.PreferenceChangeEvent;
+import java.net.URLDecoder;
 
 /**
  * Created by loof on 2016/3/12.
@@ -78,33 +76,44 @@ public class Utility {
     public static void handleWeatherResponse(Context context, String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-            JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
-            String cityName = weatherInfo.getString("city");
-            String weatherCode = weatherInfo.getString("cityid");
-            String temp1 = weatherInfo.getString("temp1");
-            String temp2 = weatherInfo.getString("temp2");
-            String weatherDesp = weatherInfo.getString("weather");
-            String publishTime = weatherInfo.getString("ptime");
-            saveWeatherInfo(context, cityName, weatherCode, temp1, temp2, weatherDesp, publishTime);
+            JSONObject retData = jsonObject.getJSONObject("retData");
+            WeatherInfo weatherInfo = new WeatherInfo();
+            weatherInfo.setCityName(URLDecoder.decode(retData.getString("city"), "UTF-8"));
+            weatherInfo.setCityPinyin(retData.getString("pinyin"));
+            weatherInfo.setCityCode(retData.getString("citycode"));
+            weatherInfo.setPublishDate(retData.getString("date"));
+            weatherInfo.setPublishTime(retData.getString("time"));
+            weatherInfo.setWeatherDesp(URLDecoder.decode(retData.getString("weather"), "UTF-8"));
+            weatherInfo.setCurrentTemp(retData.getString("temp"));
+            weatherInfo.setHighestTemp(retData.getString("h_tmp"));
+            weatherInfo.setLowestTemp(retData.getString("l_tmp"));
+            weatherInfo.setWindDirection(URLDecoder.decode(retData.getString("WD"), "UTF-8"));
+            weatherInfo.setWindSpeed(URLDecoder.decode(retData.getString("WS"), "UTF-8"));
+            weatherInfo.setSunRise(retData.getString("sunrise"));
+            weatherInfo.setSunSet(retData.getString("sunset"));
+            saveWeatherInfo(context, weatherInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void saveWeatherInfo(Context context, String cityName,
-                                       String weatherCode, String temp1,
-                                       String temp2, String weatherDesp,
-                                       String publishTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
+    public static void saveWeatherInfo(Context context, final WeatherInfo weatherInfo) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected", true);
-        editor.putString("city_name", cityName);
-        editor.putString("weather_code", weatherCode);
-        editor.putString("temp1", temp1);
-        editor.putString("temp2", temp2);
-        editor.putString("weather_desp", weatherDesp);
-        editor.putString("publish_time", publishTime);
-        editor.putString("current_date", sdf.format(new Date()));
+        editor.putString("city_name", weatherInfo.getCityName());
+        editor.putString("city_pin_yin", weatherInfo.getCityPinyin());
+        editor.putString("city_code", weatherInfo.getCityCode());
+        editor.putString("weather_code", weatherInfo.getCityCode());
+        editor.putString("publish_date", weatherInfo.getPublishDate());
+        editor.putString("publish_time", weatherInfo.getPublishTime());
+        editor.putString("weather_desp", weatherInfo.getWeatherDesp());
+        editor.putString("current_temp", weatherInfo.getCurrentTemp());
+        editor.putString("highest_temp", weatherInfo.getHighestTemp());
+        editor.putString("lowest_temp", weatherInfo.getLowestTemp());
+        editor.putString("wind_direction", weatherInfo.getWindDirection());
+        editor.putString("wind_speed", weatherInfo.getWindSpeed());
+        editor.putString("sun_rise", weatherInfo.getSunRise());
+        editor.putString("sun_set", weatherInfo.getSunSet());
         editor.commit();
     }
 }

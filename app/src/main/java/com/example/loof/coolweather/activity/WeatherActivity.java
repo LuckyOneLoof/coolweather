@@ -26,19 +26,18 @@ public class WeatherActivity extends Activity {
     private LinearLayout weatherInfoLayout;
 
     private TextView cityNameText;
-
-    private TextView publishTimeText;
-
-    private TextView currentDateText;
-
+    private TextView cityCodeTExt;
     private TextView weatherDespText;
-
-    private TextView temp1Text;
-
-    private TextView temp2Text;
+    private TextView publishTimeText;
+    private TextView curTemp;
+    private TextView lowTemp;
+    private TextView hiTemp;
+    private TextView windDirectionText;
+    private TextView windSpeedText;
+    private TextView sunRiseText;
+    private TextView sunSetText;
 
     private Button switchCity;
-
     private Button refreshWeather;
 
     @Override
@@ -47,11 +46,16 @@ public class WeatherActivity extends Activity {
         setContentView(R.layout.weather_layout);
         weatherInfoLayout = (LinearLayout) findViewById(R.id.weather_info_layout);
         cityNameText = (TextView) findViewById(R.id.city_name);
-        publishTimeText = (TextView) findViewById(R.id.publish_text);
-        currentDateText = (TextView) findViewById(R.id.current_date);
+        cityCodeTExt = (TextView) findViewById(R.id.city_code);
+        publishTimeText = (TextView) findViewById(R.id.publish_time);
         weatherDespText = (TextView) findViewById(R.id.weather_desp);
-        temp1Text = (TextView) findViewById(R.id.temp1);
-        temp2Text = (TextView) findViewById(R.id.temp2);
+        curTemp = (TextView) findViewById(R.id.cur_temp);
+        lowTemp = (TextView) findViewById(R.id.low_temp);
+        hiTemp = (TextView) findViewById(R.id.hi_temp);
+        windDirectionText = (TextView) findViewById(R.id.wind_direction);
+        windSpeedText = (TextView) findViewById(R.id.wind_speed);
+        sunRiseText = (TextView) findViewById(R.id.sun_rise);
+        sunSetText = (TextView) findViewById(R.id.sun_set);
 
         switchCity = (Button) findViewById(R.id.switch_city);
         refreshWeather = (Button) findViewById(R.id.refresh_weather);
@@ -91,34 +95,37 @@ public class WeatherActivity extends Activity {
         startService(intent);
     }
 
-    private void queryWeatherCode(String countyCode) {
-        String address = "http://www.weather.com.cn/data/list3/city" + countyCode + ".xml";
-        queryFromServer(address, "countyCode");
+    private void queryWeatherInfo(String weatherCode) {
+        String address = "http://apis.baidu.com/apistore/weatherservice/cityid?cityid=" + weatherCode;
+        queryFromServer(address, "weatherCode");
     }
 
-    private void queryWeatherInfo(String weatherCode) {
-        String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
-        queryFromServer(address, "weatherCode");
+    private void queryWeatherCode(String countyCode) {
+        String address = "http://www.weather.com.cn/data/list3/city" +
+                countyCode + ".xml";
+        queryFromServer(address, "countyCode");
     }
 
     private void queryFromServer(final String address, final String type) {
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
-            public void onFinish(String response) {
+            public void onFinish(final String response) {
                 if ("countyCode".equals(type)) {
-                    if (!TextUtils.isEmpty(response)) {
-                        String[] array = response.split("\\|");
-                        if (array != null && array.length > 0) {
-                            String weatherCode = array[1];
-                            queryWeatherInfo(weatherCode);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String[] array = response.split("\\|");
+                            if (array != null && array.length == 2) {
+                                String weatherCode = array[1];
+                                queryWeatherInfo(weatherCode);
+                            }
                         }
-                    }
+                    });
                 } else if ("weatherCode".equals(type)) {
                     Utility.handleWeatherResponse(WeatherActivity.this, response);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.e("WeatherActivity", "showWeather");
                             showWeather();
                         }
                     });
@@ -140,11 +147,17 @@ public class WeatherActivity extends Activity {
     private void showWeather() {
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(this);
         cityNameText.setText(spf.getString("city_name", ""));
-        publishTimeText.setText("今天" + spf.getString("publish_time", "") + "发布");
-        currentDateText.setText(spf.getString("current_date", ""));
+//        cityCodeTExt.setText(spf.getString("city_code", ""));
         weatherDespText.setText(spf.getString("weather_desp", ""));
-        temp1Text.setText(spf.getString("temp1", ""));
-        temp2Text.setText(spf.getString("temp2", ""));
+        publishTimeText.setText(spf.getString("publish_date", "") + " " + spf.getString("publish_time", "") + "发布");
+        curTemp.setText(spf.getString("current_temp", ""));
+        lowTemp.setText(spf.getString("lowest_temp", ""));
+        hiTemp.setText(spf.getString("highest_temp", ""));
+        windDirectionText.setText(spf.getString("wind_direction", ""));
+        windSpeedText.setText(spf.getString("wind_speed", ""));
+        sunRiseText.setText(spf.getString("sun_rise", ""));
+        sunSetText.setText(spf.getString("sun_set", ""));
+
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
     }
