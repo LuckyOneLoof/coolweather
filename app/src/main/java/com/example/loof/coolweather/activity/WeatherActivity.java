@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.loof.coolweather.R;
+import com.example.loof.coolweather.service.AutoUpdateService;
 import com.example.loof.coolweather.util.HttpCallbackListener;
 import com.example.loof.coolweather.util.HttpUtil;
 import com.example.loof.coolweather.util.Utility;
@@ -85,6 +86,9 @@ public class WeatherActivity extends Activity {
                 }
             }
         });
+
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 
     private void queryWeatherCode(String countyCode) {
