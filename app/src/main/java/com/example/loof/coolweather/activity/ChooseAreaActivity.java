@@ -49,11 +49,15 @@ public class ChooseAreaActivity extends Activity {
     private City selectedCity;
     private int currentLevel;
 
+    private boolean isFromWeatherActivity = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+
         super.onCreate(savedInstanceState);
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(this);
-        if(spf.getBoolean("city_selected", false)){
+        if(spf.getBoolean("city_selected", false) && !isFromWeatherActivity){
             Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
             finish();

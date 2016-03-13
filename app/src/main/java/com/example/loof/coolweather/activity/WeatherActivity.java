@@ -67,9 +67,6 @@ public class WeatherActivity extends Activity {
         switchCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                editor.putBoolean("city_selected", false);
-                editor.commit();
                 Intent intent = new Intent(WeatherActivity.this, ChooseAreaActivity.class);
                 intent.putExtra("from_weather_activity", true);
                 startActivity(intent);
