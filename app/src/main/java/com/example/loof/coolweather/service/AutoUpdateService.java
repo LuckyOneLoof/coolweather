@@ -33,7 +33,6 @@ public class AutoUpdateService extends Service {
             @Override
             public void run() {
                 updateWeather();
-                Log.e("AutoUpdateService", "updateWeather");
             }
         }).start();
 
